@@ -34,14 +34,14 @@ def get_stop_data(request):
     filter_kwargs = {'stop_id': stop_id,
                      'trip__service__start_date__lte': (now.date()),
                      'trip__service__end_date__gte': (now.date()),
-                     'arrival_time__gte': (now.strftime('%H:%M:%S')),
+                     'departure_time__gte': (now.strftime('%H:%M:%S')),
                      'trip__service__%s' % (now.strftime('%A').lower()): 1}
 
-    stop_times = StopTime.objects.select_related('trip', 'stop', 'trip__route')\
+    stop_times = StopTime.objects.select_related('trip', 'trip__route')\
                                  .filter(**filter_kwargs)\
-                                 .order_by('arrival_time')[:15]
+                                 .order_by('departure_time')[:15]
 
     result = [{'number': s.trip.route.route_short_name.encode('utf-8'),
-               'dep': s.arrival_time} for s in stop_times]
+               'dep': s.departure_time} for s in stop_times]
 
     return {'err': 'ok', 'result': result}
