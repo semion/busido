@@ -55,7 +55,7 @@ def get_trip_stops(request):
     trip = Trip.objects.get(pk=trip_id)
 
     if trip.shape_id:
-        shapes = list(Shape.objects.filter(pk=trip.shape_id).order_by('shape_pt_sequence').values_list('shape_pt_lat', 'shape_pt_lon'))
+        shapes = Shape.objects.get(pk=trip.shape_id).the_geom.coords
     else:
         shapes = []
 

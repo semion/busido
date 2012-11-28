@@ -81,8 +81,8 @@ class StopTime(models.Model):
 
 class Shape(models.Model):
     shape_id = models.TextField(primary_key=True, db_column='shape_id')
-    the_geom = models.MultiLineStringField()
+    the_geom = models.LineStringField()
 
     class Meta:
-        db_table = 'gtfs_shapes'
+        db_table = 'gtfs_shape_geoms'
         managed = False

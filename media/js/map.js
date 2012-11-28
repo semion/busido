@@ -104,7 +104,7 @@ function handle_trip_click(e){
 
             var path = [];
             $.each(data.shapes, function(key, val){
-                path.push(new google.maps.LatLng(val[0], val[1]));
+                path.push(new google.maps.LatLng(val[1], val[0]));
             });
             var line = new google.maps.Polyline({
                 path: path,
