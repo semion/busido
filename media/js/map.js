@@ -1,4 +1,5 @@
 var info, map, markers = {};
+var trip_view = false;
 
 function initialize() {
 	var mapOptions = {
@@ -28,6 +29,8 @@ function geolocationSuccess(position) {
 	map.setCenter(pos);
 	google.maps.event.addListener(map, 'idle',
 	    function(){
+            if(trip_view)
+                return;
 	        $.getJSON('/api/get_bounded_stops/', {
 		        bounds : map.getBounds().toUrlValue(10)
 	            }, handleStopsList);
@@ -64,7 +67,7 @@ function handleMarkerClick() {
 		content = "<h4>" + marker.title + "</h4>";
 		if (data.result.length > 0) {
 			$.each(data.result, function(pos, val) {
-				content += val.dep +" - " + val.number + "<br />";
+				content += val.dep +" - <a href='#' class='trip_link' rel='" + val.trip + "'>" + val.number + "</a><br />";
 			});
 		} else 
 			content += "no data<br />";
@@ -76,7 +79,50 @@ function handleMarkerClick() {
 			position : marker.position,
 			content : content
 		});
+        google.maps.event.addListener(info, 'domready', function(){
+            console.log('info window had loaded');
+            $(".trip_link").bind('click', handle_trip_click);
+        });
 	});
+}
+
+function handle_trip_click(e){
+    e.preventDefault();
+    var trip_id = $(this).attr('rel');
+    console.log(trip_id);
+    info.close();
+    trip_view = true;
+    $.getJSON('/api/get_trip_stops/', {
+        'trip_id': trip_id
+    }, function(data){
+            $.each(markers, function(key, val){
+                val.setMap(null);
+                delete markers[key];
+            });
+
+            handleStopsList(data);
+
+            var path = [];
+            $.each(data.shapes, function(key, val){
+                path.push(new google.maps.LatLng(val[0], val[1]));
+            });
+            var line = new google.maps.Polyline({
+                path: path,
+                strokeColor: '#ff0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 3
+            });
+            line.setMap(map);
+
+            var bounds = new google.maps.LatLngBounds();
+            $.each(data.result, function(key, val){
+                var latlng = new google.maps.LatLng(val.lat, val.lon);
+                bounds.extend(latlng);
+            });
+            map.fitBounds(bounds);
+        }
+    )
+
 }
 
 function handleNoGeolocation(errorFlag) {

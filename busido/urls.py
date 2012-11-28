@@ -14,6 +14,7 @@ urlpatterns = patterns('',
         }),
     url(r'^api/get_bounded_stops/', 'gtfs.views.get_bounded_stops'),
     url(r'^api/get_stop_data/', 'gtfs.views.get_stop_data'),
+    url(r'^api/get_trip_stops/', 'gtfs.views.get_trip_stops'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

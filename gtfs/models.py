@@ -60,6 +60,8 @@ class Trip(models.Model):
     service = models.ForeignKey(Calendar, db_column='service_id')
     trip_id = models.TextField(primary_key=True)
     trip_headsign = models.TextField()
+    shape = models.ForeignKey('Shape', null=True, db_column='shape_id')
+
 
     class Meta:
         db_table = 'gtfs_trips'
@@ -75,4 +77,12 @@ class StopTime(models.Model):
 
     class Meta:
         db_table = 'gtfs_stop_times'
+        managed = False
+
+class Shape(models.Model):
+    shape_id = models.TextField(primary_key=True, db_column='shape_id')
+    the_geom = models.MultiLineStringField()
+
+    class Meta:
+        db_table = 'gtfs_shapes'
         managed = False
