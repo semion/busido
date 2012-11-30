@@ -29,17 +29,20 @@ def get_bounded_stops(request):
 def get_stop_data(request):
     stop_id = request.REQUEST.get('stop_id')
 
-    now = datetime.now()
+#    now = datetime.now()
+    now = datetime(2012, 11, 30, 12, 0, 0)
+    dep_time_seconds = now.hour * 60 * 60 + now.minute * 60 + now.second
 
     filter_kwargs = {'stop_id': stop_id,
-                     'trip__service__start_date__lte': (now.date()),
-                     'trip__service__end_date__gte': (now.date()),
-                     'departure_time__gte': (now.strftime('%H:%M:%S')),
+                     'departure_time_seconds__gte': dep_time_seconds,
+                     'trip__service__start_date__lte': now.date(),
+                     'trip__service__end_date__gte': now.date(),
                      'trip__service__%s' % (now.strftime('%A').lower()): 1}
 
     stop_times = StopTime.objects.select_related('trip', 'trip__route')\
                                  .filter(**filter_kwargs)\
-                                 .order_by('departure_time')[:15]
+                                 .order_by('departure_time_seconds')[:15]
+    print stop_times.query
 
     result = [{'number': s.trip.route.route_short_name.encode('utf-8'),
                'trip': s.trip_id,

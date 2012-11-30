@@ -1,5 +1,12 @@
 var info, map, markers = {};
 var trip_view = false;
+var line_colors = ['red', 'blue', 'green', 'brown', 'violet'];
+
+function get_line_color(){
+    var col = line_colors.shift();
+    line_colors.push(col);
+    return col;
+}
 
 function initialize() {
 	var mapOptions = {
@@ -22,65 +29,79 @@ function initialize() {
 		// Browser doesn't support Geolocation
 		handleNoGeolocation(false);
 	}
+
+    $("#hide_stops_link").bind('click', function(e){
+        e.preventDefault();
+        $(this).text(trip_view ? 'hide stops' : 'show stops');
+        trip_view = !trip_view;
+        toggle_markers(trip_view ? null : map, false);
+    });
 }
 
 function geolocationSuccess(position) {
 	var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 	map.setCenter(pos);
 	google.maps.event.addListener(map, 'idle',
-	    function(){
+        function(){
             if(trip_view)
                 return;
-	        $.getJSON('/api/get_bounded_stops/', {
-		        bounds : map.getBounds().toUrlValue(10)
-	            }, handleStopsList);
-            });
+            $.getJSON('/api/get_bounded_stops/',{bounds : map.getBounds().toUrlValue(10)}, handleStopsList);
+        });
 }
 
 function handleStopsList(data){
-	if(data.err == 'ok'){
-	    marker_keys = Object.keys(markers);
-	    // fill new markers obj
+	if(data.err === 'ok'){
+        var marker_keys = Object.keys(markers);
+        // fill new markers obj
 		$.each(data.result, function(key, val) {
-		    if($.inArray(val.id, marker_keys) > -1)
-		        return;
-		        
-			marker = new google.maps.Marker({
+            if($.inArray(val.id, marker_keys) > -1)
+                return;
+			var marker = new google.maps.Marker({
 				position : new google.maps.LatLng(val.lat, val.lon),
 				map : map,
-				title : val['name']
+				title : val.name,
+                optimized: false
 			});
-			marker['stop_id'] = val.id;
-			l = google.maps.event.addListener(marker, 'click', handleMarkerClick);
+			marker.stop_id = val.id;
+			var l = google.maps.event.addListener(marker, 'click', handleMarkerClick);
 			markers[val.id] = marker;
 		});
 	}
 }
 
-function handleMarkerClick() {
-	marker = this;
+function toggle_markers(target, clear){
+    $.each(markers, function(key, val){
+        val.setMap(target);
+    });
+    if(clear && target === null){
+        markers = [];
+    }
+}
+
+function handleMarkerClick(){
+	var marker = this;
 	if(info !== undefined)
-	    info.close();
+        info.close();
 	$.getJSON('/api/get_stop_data/', {
 		'stop_id' : marker.stop_id
 	}, function(data) {
-		content = "<h4>" + marker.title + "</h4>";
+		var content = "<h4>" + marker.title + "</h4>";
 		if (data.result.length > 0) {
 			$.each(data.result, function(pos, val) {
 				content += val.dep +" - <a href='#' class='trip_link' rel='" + val.trip + "'>" + val.number + "</a><br />";
 			});
-		} else 
-			content += "no data<br />";
+		} else {
+            content += "no data<br />";
+        }
 
-		now = new Date();
-		content += "<small>last update " + now.toLocaleTimeString() + "</small>";
+		//var now = new Date();
+		//content += "<small>last update " + now.toLocaleTimeString() + "</small>";
 		info = new google.maps.InfoWindow({
 			map : map,
 			position : marker.position,
 			content : content
 		});
         google.maps.event.addListener(info, 'domready', function(){
-            console.log('info window had loaded');
             $(".trip_link").bind('click', handle_trip_click);
         });
 	});
@@ -108,7 +129,7 @@ function handle_trip_click(e){
             });
             var line = new google.maps.Polyline({
                 path: path,
-                strokeColor: '#ff0000',
+                strokeColor: get_line_color(),
                 strokeOpacity: 1.0,
                 strokeWeight: 3
             });
@@ -121,17 +142,12 @@ function handle_trip_click(e){
             });
             map.fitBounds(bounds);
         }
-    )
+    );
 
 }
 
 function handleNoGeolocation(errorFlag) {
-	if (errorFlag) {
-		var content = 'Error: The Geolocation service failed.';
-	} else {
-		var content = 'Error: Your browser doesn\'t support geolocation.';
-	}
-
+	var content = errorFlag ? 'Error: The Geolocation service failed.' : 'Error: Your browser doesn\'t support geolocation.';
 	var options = {
 		map : map,
 		position : new google.maps.LatLng(60, 105),

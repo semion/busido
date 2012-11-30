@@ -70,7 +70,9 @@ class Trip(models.Model):
 class StopTime(models.Model):
     trip = models.ForeignKey(Trip, related_name='stoptimes')
     arrival_time = models.TextField()
+    arrival_time_seconds = models.IntegerField()
     departure_time = models.TextField()
+    departure_time_seconds = models.IntegerField()
     stop = models.ForeignKey(Stop, related_name='stoptimes')
     stop_sequence = models.IntegerField(primary_key=True) # this is fake pk
     stop_headsign = models.TextField()
