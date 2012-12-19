@@ -2,8 +2,13 @@ __author__ = 'semion'
 
 from gtfs.models import Stop, StopTime, Trip, Shape
 from django.contrib.gis.geos import LinearRing
-from annoying.decorators import ajax_request
+from annoying.decorators import ajax_request, render_to
 from datetime import datetime
+
+
+@render_to('index.html')
+def home(request):
+    return {}
 
 @ajax_request
 def get_bounded_stops(request):
@@ -29,8 +34,8 @@ def get_bounded_stops(request):
 def get_stop_data(request):
     stop_id = request.REQUEST.get('stop_id')
 
-#    now = datetime.now()
-    now = datetime(2012, 11, 30, 12, 0, 0)
+    now = datetime.now()
+#    now = datetime(2012, 11, 30, 12, 0, 0)
     dep_time_seconds = now.hour * 60 * 60 + now.minute * 60 + now.second
 
     filter_kwargs = {'stop_id': stop_id,
@@ -39,12 +44,13 @@ def get_stop_data(request):
                      'trip__service__end_date__gte': now.date(),
                      'trip__service__%s' % (now.strftime('%A').lower()): 1}
 
-    stop_times = StopTime.objects.select_related('trip', 'trip__route')\
+    stop_times = StopTime.objects.select_related('trip', 'trip__route', 'trip__agency')\
                                  .filter(**filter_kwargs)\
                                  .order_by('departure_time_seconds')[:15]
     print stop_times.query
 
-    result = [{'number': s.trip.route.route_short_name.encode('utf-8'),
+    result = [{'number': s.trip.route.route_short_name,
+               'agency': s.trip.route.agency.agency_name,
                'trip': s.trip_id,
                'dep': s.departure_time} for s in stop_times]
 

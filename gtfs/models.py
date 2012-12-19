@@ -18,7 +18,7 @@ class Stop(models.Model):
         managed = False
 
 class Agency(models.Model):
-    agency_id = models.IntegerField(primary_key=True)
+    agency_id = models.TextField(primary_key=True)
     agency_name = models.TextField()
     agency_url = models.TextField()
     agency_timezone = models.TextField()

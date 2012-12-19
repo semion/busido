@@ -1,8 +1,11 @@
 # Django settings for busido project.
 import os
 
-DEBUG = True
+DEBUG = os.environ('DEVELOPMENT') is not None
 TEMPLATE_DEBUG = DEBUG
+
+INTERNAL_IPS = ('127.0.0.1',)
+
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -13,11 +16,11 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'busido2',                      # Or path to database file if using sqlite3.
-        'USER': 'postgres',                      # Not used with sqlite3.
-        'PASSWORD': 'kmn04gpd',                  # Not used with sqlite3.
-        'HOST': '192.168.2.102',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'NAME': os.environ.get('DB_NAME'),                      # Or path to database file if using sqlite3.
+        'USER': os.environ.get('DB_USERNAME'),                      # Not used with sqlite3.
+        'PASSWORD': os.environ.get('DB_PASSWORD'),                  # Not used with sqlite3.
+        'HOST': os.environ.get('DB_HOST', ''),                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': os.environ.get('DB_PORT', ''),                      # Set to empty string for default. Not used with sqlite3.
     }
 }
 
@@ -98,7 +101,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+#    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    )
 
 ROOT_URLCONF = 'busido.urls'
 
@@ -121,6 +125,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_extensions',
     'django.contrib.gis',
+#    'debug_toolbar',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
