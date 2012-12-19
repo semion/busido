@@ -1,7 +1,7 @@
 # Django settings for busido project.
 import os
 
-DEBUG = os.environ('DEVELOPMENT') is not None
+DEBUG = os.environ.get('DEVELOPMENT') is not None
 TEMPLATE_DEBUG = DEBUG
 
 INTERNAL_IPS = ('127.0.0.1',)
