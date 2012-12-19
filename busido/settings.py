@@ -24,6 +24,8 @@ DATABASES = {
     }
 }
 
+POSTGIS_TEMPLATE = 'postgistemplate'
+
 OUR_ROOT = os.path.dirname(__name__)
 
 # Local time zone for this installation. Choices can be found here:
