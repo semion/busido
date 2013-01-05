@@ -34,8 +34,7 @@ def get_bounded_stops(request):
 def get_stop_data(request):
     stop_id = request.REQUEST.get('stop_id')
 
-    now = datetime.now()
-#    now = datetime(2012, 11, 30, 12, 0, 0)
+    now = datetime.utcnow()
     dep_time_seconds = now.hour * 60 * 60 + now.minute * 60 + now.second
 
     filter_kwargs = {'stop_id': stop_id,
@@ -47,7 +46,6 @@ def get_stop_data(request):
     stop_times = StopTime.objects.select_related('trip', 'trip__route', 'trip__agency')\
                                  .filter(**filter_kwargs)\
                                  .order_by('departure_time_seconds')[:15]
-    print stop_times.query
 
     result = [{'number': s.trip.route.route_short_name,
                'agency': s.trip.route.agency.agency_name,
@@ -68,10 +66,7 @@ def get_trip_stops(request):
     else:
         shapes = []
 
-
     stops = Stop.objects.filter(stoptimes__trip_id=trip_id).order_by('stoptimes__stop_sequence')
-
-
 
     result = [{'lat': s.stop_lat,
                'lon': s.stop_lon,
