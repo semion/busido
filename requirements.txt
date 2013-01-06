@@ -1,0 +1,7 @@
+Django==1.4.3
+django-annoying==0.7.6
+django-extensions==1.0.2
+gunicorn==0.17.0
+psycopg2==2.4.6
+simplejson==3.0.5
+wsgiref==0.1.2
