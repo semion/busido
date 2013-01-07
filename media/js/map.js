@@ -139,7 +139,7 @@
                 });
 
                 // clear previous line
-                if(line instanceof google.maps.Poluline){
+                if(line instanceof google.maps.Polyline){
                     line.setMap(null);
                 }
 
