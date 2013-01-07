@@ -1,5 +1,5 @@
 (function($, google){
-    var infoWindow, map, markers = {};
+    var infoWindow, map, line, markers = {};
     var trip_view = false;
     var line_colors = ['red', 'blue', 'green', 'brown', 'violet'];
 
@@ -58,10 +58,12 @@
 
     function handleStopsList(data){
         if(data.err === 'ok'){
-            var marker_keys = Object.keys(markers);
+            var old_marker_keys = Object.keys(markers);
+            var new_marker_keys = [];
             // fill new markers obj
             $.each(data.result, function(key, val) {
-                if($.inArray(val.id, marker_keys) > -1) {
+                new_marker_keys.push(val.id);
+                if($.inArray(val.id, old_marker_keys) > -1) {
                     return;
                 }
                 var marker = new google.maps.Marker({
@@ -74,6 +76,13 @@
                 marker.stop_id = val.id;
                 var l = google.maps.event.addListener(marker, 'click', handleMarkerClick);
                 markers[val.id] = marker;
+            });
+            // remove markers outside boundaries
+            $.each(old_marker_keys, function(key, val){
+                if($.inArray(val, new_marker_keys) === -1){
+                    markers[val].setMap(null);
+                    delete markers[val];
+                }
             });
         }
     }
@@ -104,6 +113,7 @@
                 content += "no data<br />";
             }
             infoWindow.setContent(content);
+            infoWindow.open(map, marker);
         });
     }
 
@@ -127,7 +137,13 @@
                 $.each(data.shapes, function(key, val){
                     path.push(new google.maps.LatLng(val[1], val[0]));
                 });
-                var line = new google.maps.Polyline({
+
+                // clear previous line
+                if(line.setMap){
+                    line.setMap(null);
+                }
+
+                line = new google.maps.Polyline({
                     path: path,
                     strokeColor: get_line_color(),
                     strokeOpacity: 0.6,
