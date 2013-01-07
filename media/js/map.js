@@ -102,7 +102,8 @@
         infoWindow.open(map, marker);
 
         $.getJSON('/api/get_stop_data/', {
-            'stop_id' : marker.stop_id
+            'stop_id' : marker.stop_id,
+            'ts': new Date().getTime() / 1000
         }, function(data) {
             var content = "<h4>" + marker.title + "</h4>";
             if (data.result.length > 0) {
