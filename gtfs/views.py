@@ -34,7 +34,7 @@ def get_bounded_stops(request):
 def get_stop_data(request):
     stop_id = request.REQUEST.get('stop_id')
 
-    now = datetime.utcnow()
+    now = datetime.now()
     dep_time_seconds = now.hour * 60 * 60 + now.minute * 60 + now.second
 
     filter_kwargs = {'stop_id': stop_id,
