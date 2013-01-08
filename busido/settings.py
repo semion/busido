@@ -118,6 +118,10 @@ TEMPLATE_DIRS = (
     os.path.join(OUR_ROOT, 'templates'),
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'busido.context_processor.google_analytics_key',
+)
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -163,3 +167,5 @@ LOGGING = {
         },
     }
 }
+
+GOOGLE_ANALYTICS_KEY = os.environ.get('GA_KEY')
