@@ -3,6 +3,10 @@
     var trip_view = false;
     var line_colors = ['red', 'blue', 'green', 'brown', 'violet'];
 
+    Number.prototype.toRad = function(){
+        return this * (Math.PI / 180);
+    };
+
     function get_line_color(){
         var col = line_colors.shift();
         line_colors.push(col);
@@ -44,6 +48,21 @@
         });
     }
 
+
+
+    // http://www.movable-type.co.uk/scripts/latlong.html
+    function get_distance(p1, p2){
+        var lat1 = p1.lat().toRad(),
+            lon1 = p1.lng().toRad(),
+            lat2 = p2.lat().toRad(),
+            lon2 = p2.lng().toRad(),
+            R = 6371000; // m
+
+        return Math.acos(Math.sin(lat1)*Math.sin(lat2) +
+                Math.cos(lat1)*Math.cos(lat2) *
+                Math.cos(lon2-lon1)) * R;
+    }
+
     function geolocationSuccess(position) {
         var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
         map.setCenter(pos);
@@ -52,7 +71,7 @@
                 if(trip_view) {
                     return;
                 }
-                $.getJSON('/api/get_bounded_stops/',{bounds : map.getBounds().toUrlValue(10)}, handleStopsList);
+                $.getJSON('/api/get_nearest_stops/',{coords: map.getCenter().toUrlValue(10)}, handleStopsList);
             });
     }
 

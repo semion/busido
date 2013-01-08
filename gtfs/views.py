@@ -1,7 +1,6 @@
-__author__ = 'semion'
-
+from django.contrib.gis.measure import Distance
 from gtfs.models import Stop, StopTime, Trip, Shape
-from django.contrib.gis.geos import LinearRing
+from django.contrib.gis.geos import LinearRing, Point
 from annoying.decorators import ajax_request, render_to
 from datetime import datetime
 
@@ -29,6 +28,19 @@ def get_bounded_stops(request):
 
     return {'err': 'ok', 'result': result}
 
+@ajax_request
+def get_nearest_stops(request):
+    coords = map(float, request.REQUEST.get('coords').split(",")[::-1])
+    distance = Distance(m=float(request.REQUEST.get('distance', '500')))
+    p = Point(*coords, srid=4326)
+    stops = Stop.objects.filter(the_geom__distance_lte=(p, distance))
+
+    result = [{'lat': s.stop_lat,
+               'lon': s.stop_lon,
+               'name': s.stop_name,
+               'id': s.stop_id} for s in stops]
+
+    return {'err': 'ok', 'result': result}
 
 @ajax_request
 def get_stop_data(request):

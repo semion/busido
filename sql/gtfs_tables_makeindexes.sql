@@ -123,6 +123,9 @@ create index arr_time_index on gtfs_stop_times(arrival_time_seconds);
 create index dep_time_index on gtfs_stop_times(departure_time_seconds);
 create index stop_seq_index on gtfs_stop_times(trip_id,stop_sequence);
 
+create index calendar_start_date on gtfs_calendar(start_date);
+create index calendar_end_date on gtfs_calendar(end_date);
+
 ALTER TABLE gtfs_frequencies ADD CONSTRAINT freq_tid_fkey
       FOREIGN KEY (trip_id)
       REFERENCES gtfs_trips(trip_id);
