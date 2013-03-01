@@ -12,6 +12,7 @@ urlpatterns = patterns('',
         'document_root': settings.MEDIA_ROOT,
         }),
     url(r'^api/get_bounded_stops/', 'gtfs.views.get_bounded_stops'),
+    url(r'^api/get_nerarest_stops/', 'gtfs.views.get_nearest_stops'),
     url(r'^api/get_stop_data/', 'gtfs.views.get_stop_data'),
     url(r'^api/get_trip_stops/', 'gtfs.views.get_trip_stops'),
 
