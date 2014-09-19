@@ -6,8 +6,8 @@ ALTER TABLE gtfs_agency ADD CONSTRAINT agency_name_pkey
       PRIMARY KEY (agency_id);
 ALTER TABLE gtfs_agency 
       ALTER COLUMN agency_name SET NOT NULL;
-ALTER TABLE gtfs_agency 
-      ALTER COLUMN agency_url SET NOT NULL;
+--ALTER TABLE gtfs_agency 
+--      ALTER COLUMN agency_url SET NOT NULL;
 ALTER TABLE gtfs_agency 
       ALTER COLUMN agency_timezone SET NOT NULL;
 

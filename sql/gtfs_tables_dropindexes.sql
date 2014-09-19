@@ -38,8 +38,8 @@ ALTER TABLE gtfs_transfers DROP CONSTRAINT xfer_sid_fkey CASCADE;
 
 ALTER TABLE gtfs_agency 
       ALTER COLUMN agency_name DROP NOT NULL;
-ALTER TABLE gtfs_agency 
-      ALTER COLUMN agency_url DROP NOT NULL;
+-- ALTER TABLE gtfs_agency 
+--      ALTER COLUMN agency_url DROP NOT NULL;
 ALTER TABLE gtfs_agency 
       ALTER COLUMN agency_timezone DROP NOT NULL;
 ALTER TABLE gtfs_stops 
