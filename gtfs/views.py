@@ -63,7 +63,7 @@ def get_stop_data(request):
     result = [{'number': s.trip.route.route_short_name,
                'agency': s.trip.route.agency.agency_name,
                'trip': s.trip_id,
-               'dep': s.departure_time} for s in stop_times]
+               'dep': s.departure_time[:-3]} for s in stop_times]
 
     return {'err': 'ok', 'result': result}
 
