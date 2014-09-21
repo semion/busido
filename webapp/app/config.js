@@ -1,5 +1,4 @@
 require.config({
-	waitSeconds: 5,
   paths: {
   	"async": "../bower_components/requirejs-plugins/src/async",
     "underscore": "../bower_components/lodash/dist/lodash.underscore",

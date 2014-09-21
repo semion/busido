@@ -67,7 +67,6 @@ define(["backbone", "gmaps", "backbone.googlemaps", "router"], function(Backbone
 
   App.createMap = function() {
     var mapOptions = {
-      center: new google.maps.LatLng(44.9796635, -93.2748776),
       zoom: 12,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     }

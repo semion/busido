@@ -10,15 +10,15 @@ module.exports = function(grunt) {
   var LIVERELOAD_PORT = 35729;
 
   grunt.initConfig({
-    connect: {
-      server: {
-        options: {
-          base: '.',
-          // This will inject live reload script into the html
-          livereload: LIVERELOAD_PORT
-        }
-      }
-    },
+    // connect: {
+    //   server: {
+    //     options: {
+    //       base: '.',
+    //       // This will inject live reload script into the html
+    //       livereload: LIVERELOAD_PORT
+    //     }
+    //   }
+    // },
   
     watch: {
       options: {
@@ -30,11 +30,11 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-connect');
+  // grunt.loadNpmTasks('grunt-contrib-connect');
 
   // Run grunt server to get going
   grunt.registerTask('server', [
-    'connect',
+    // 'connect',
     'watch'
   ]);
 };
