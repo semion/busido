@@ -27,7 +27,7 @@ def get_bounded_stops(request):
                'name': s.stop_name,
                'id': s.stop_id} for s in stops]
 
-    return {'err': 'ok', 'result': result}
+    return {'err': 'ok', 'result': result, 'waka': 'waka'}
 
 @ajax_request
 def get_nearest_stops(request):
