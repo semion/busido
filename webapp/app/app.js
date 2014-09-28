@@ -1,89 +1,113 @@
-define(["backbone", "gmaps", "backbone.googlemaps", "router"], function(Backbone, google, GoogleMaps, Router){
-  "use strict";
+/* jshint browser: true, jquery: true, devel: true */
+/* global define */
+define([
+  'jquery',
+  'underscore',
+  'backbone',
+  'router',
+  'gmaps',
+  'backbone.googlemaps'],
+  function($, _, Backbone, Router, google){
+  'use strict';
+  
   var App = {};
 
-  // location to be updated on drag stop
-	App.Location = Backbone.GoogleMaps.Location.extend({
-	  idAttribute: 'title',
-	  defaults: {
-	    lat: 45,
-	    lng: -93
-	  }
-	});
+	App.BusStop = Backbone.GoogleMaps.Location.extend({});
 
-  App.LocationCollection = Backbone.GoogleMaps.LocationCollection.extend({
-    model: App.Location
-  });
+  App.BusStopCollection = Backbone.GoogleMaps.LocationCollection.extend({});
 
-  App.InfoWindow = Backbone.GoogleMaps.InfoWindow.extend({
-    template: '#infoWindow-template',
-
-    events: {
-      'mouseenter h2': 'logTest'
-    },
-
-    logTest: function() {
-      console.log('test in InfoWindow');
+  App.BusStopView = Backbone.View.extend({
+    render: function(){
+      var marker = new google.maps.Marker({
+        position: new google.maps.LatLng(val.lat, val.lon),
+        map: App.map,
+        title: .name,
+        optimized: true
+//        icon: createMarker(13, 14, 7, 'rgba(255, 0, 0, 0.8)')
+      });
+      
     }
   });
+
+  App.BusStopCollection = Backbone.Collection.extend({
+    model: App.Location,
+    url: function(){
+      return '/api/get_nearest_stops/?coords=' + 
+      App.map.getCenter().toUrlValue(10);
+    }
+  });
+
+  App.MapView = Backbone.GoogleMaps.MapView.extend({
+    render: function() {
+
+      return this;
+    }
+  });
+
+
+
+
 
   App.detectGeoLocation = function(){
-    
     var app = this;
 
-    var geolocationSuccess = function(position) {
+    var _geolocationSuccess = function(position) {
         app.Location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
         app.map.setCenter(app.Location);
-        google.maps.event.addListener(app.map, 'idle',
-            function(){
-                $.getJSON('/api/get_nearest_stops/',{coords: app.map.getCenter().toUrlValue(10)},
-                  app.handleStopsList);
-            });
-    }
-
-    var handleNoGeolocation = function(err){
-      $.ajax('http://freegeoip.net/json/', {
-            dataType: 'jsonp'
-        }).always(handleGeoipRequest); 
+        
     };
 
-    var handleGeoipRequest = function(data){
-        app.map.setCenter(new google.maps.LatLng(data.latitude, data.longitude));
+    var _handleNoGeolocation = function(err){
+      $.ajax('//freegeoip.net/json/', {
+            dataType: 'jsonp'
+        }).always(_handleGeoipResponse); 
+    };
+
+    var _handleGeoipResponse = function(data){
+      app.Location = new google.maps.LatLng(data.latitude, data.longitude);
+      app.map.setCenter(app.Location);
     };
 
     // Try HTML5 geolocation
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(geolocationSuccess, function() {
-            handleNoGeolocation(true);
-        });
-    } else {
-        // Browser doesn't support Geolocation
-        handleNoGeolocation(false);
-
+        navigator.geolocation.getCurrentPosition(
+          _geolocationSuccess,
+          _handleNoGeolocation);
     }
 
-    return this
-  }
+    return this;
+  };
 
   App.createMap = function() {
     var mapOptions = {
-      zoom: 12,
+      zoom: 16,
       mapTypeId: google.maps.MapTypeId.ROADMAP
-    }
+    };
 
     // Instantiate map
     this.map = new google.maps.Map($('#map_canvas')[0], mapOptions);
 
     return this;
-  }
+  };
 
   App.init = function(){
-    console.log("wakawaka");
+    console.log('wakawaka');
     this.createMap().detectGeoLocation();
-  }
+    google.maps.event.addListener(this.map, 'idle', this.stopListChanged);
+  };
+
+  App.LocationChanged = function(){
+    $.ajax('/api/get_nearest_stops/', {
+      type: 'GET',
+      dataType: 'json',
+      data: {coords: this.Location.toUrlValue(10)}
+    }).always(this.handleStopsList);
+  };
+
+  
   
   // The root path to run the application through.
-  App.root = "/";
+  App.root = '/';
 
-  return App
+  return App;
 });
